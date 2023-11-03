@@ -1,6 +1,6 @@
 require_relative './fetcher'
 
 ARGV.each do |url|
-  x = Fetcher.new(url).fetch
-  p x
+  service = Fetcher.new(url)
+  response = service.save_html_file
 end
