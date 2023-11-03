@@ -42,4 +42,14 @@ class FetcherTest < Minitest::Test
 
     refute(body.empty?)
   end
+
+  def test_save_html_file
+    fetcher = Fetcher.new('google.com')
+
+    File.stub(:write, true) do
+      result = fetcher.save_html_file
+
+      assert_equal('google.com.html', result)
+    end
+  end
 end
