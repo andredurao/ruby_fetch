@@ -1,12 +1,27 @@
 # frozen_string_literal: true
 
-require 'uri'
-require 'net/http'
+# Fetch service
+class Fetch
+  require 'uri'
+  require 'net/http'
 
-ARGV.each do |arg|
-  uri = URI(arg)
+  attr_reader :uri
 
-  raise 'Invalid URL' unless uri.host
+  def initialize(url)
+    url = "http://#{url}" unless url.start_with?(/https?:\/\//)
+    @uri = URI(url)
+  end
 
-  p uri, uri.host
+  def execute
+
+    raise 'Invalid URL' unless uri.host
+
+    response = Net::HTTP::Get(uri)
+
+    p response
+  end
+end
+
+ARGV.each do |url|
+  Fetch.new(url).execute
 end
