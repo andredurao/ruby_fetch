@@ -6,17 +6,20 @@ class Fetcher
   require 'open-uri'
   require_relative './metadata'
 
-  attr_reader :url
+  attr_reader :url, :metadata
 
-  def initialize(url = '')
+  def initialize(url: '', metadata: false)
     @url = url
+    @metadata = metadata
   end
 
   def fetch
     File.write(filename, fetch_content)
-    metadata = Metadata.new(filename)
-
-    { last_fetch: Time.now.utc, site: host }.merge(metadata.summary)
+    if metadata
+      metadata_fetcher = Metadata.new(filename)
+      return { last_fetch: Time.now.utc, site: host }.merge(metadata_fetcher.summary)
+    end
+    filename
   end
 
   def fetch_content

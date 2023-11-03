@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
+require 'minitest/autorun'
 require 'webmock/minitest'
 require_relative './fetcher'
 
@@ -14,19 +14,19 @@ class FetcherTest < Minitest::Test
   end
 
   def test_valid_url_when_is_valid
-    fetcher = Fetcher.new('https://google.com')
+    fetcher = Fetcher.new(url: 'https://google.com', metadata: false)
 
     assert(fetcher.valid_url?)
   end
 
   def test_valid_url_when_is_blank
-    fetcher = Fetcher.new('')
+    fetcher = Fetcher.new(url: '', metadata: false)
 
     refute(fetcher.valid_url?)
   end
 
   def test_fetch_content_invalid_url
-    fetcher = Fetcher.new('')
+    fetcher = Fetcher.new(url: '', metadata: false)
 
     exception = assert_raises do
       fetcher.fetch_content
@@ -36,23 +36,27 @@ class FetcherTest < Minitest::Test
   end
 
   def test_fetch_content_valid_url
-    fetcher = Fetcher.new('https://google.com')
+    fetcher = Fetcher.new(url: 'https://google.com', metadata: false)
 
     body = fetcher.fetch_content
 
     refute(body.empty?)
   end
 
-  def test_fetch
-    fetcher = Fetcher.new('https://google.com')
+  def test_fetch_with_metadata
+    fetcher = Fetcher.new(url: 'https://google.com', metadata: true)
+    mock_metadata = Minitest::Mock.new
+    mock_metadata.expect(:summary, { num_links: 18, images: 1, site: 'google.com' })
 
     File.stub(:write, true) do
-      result = fetcher.fetch
+      Metadata.stub(:new, mock_metadata) do
+        result = fetcher.fetch
 
-      assert_equal(%i[last_fetch site num_links images], result.keys)
-      assert_equal(18, result[:num_links])
-      assert_equal(1, result[:images])
-      assert_equal('google.com', result[:site])
+        assert_equal(%i[last_fetch site num_links images], result.keys)
+        assert_equal(18, result[:num_links])
+        assert_equal(1, result[:images])
+        assert_equal('google.com', result[:site])
+      end
     end
   end
 end
