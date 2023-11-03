@@ -8,7 +8,7 @@ class Fetcher
 
   attr_reader :url, :logger
 
-  def initialize(url)
+  def initialize(url = '')
     @url = url.start_with?(/https?:\/\//) ? url : "http://#{url}"
     @logger = Logger.new(STDOUT)
   end
@@ -31,8 +31,18 @@ class Fetcher
     end
   end
 
+  def save_html_file
+    response = fetch
+    File.write(filename, response.body)
+  end
+
   def valid_url?
-    !URI(@url).host.empty?
+    !!URI(@url).host && !URI(@url).host.empty?
+  end
+
+  def filename
+    uri = URI(@url)
+    "#{uri.host}.html"
   end
 
   private
