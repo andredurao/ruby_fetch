@@ -4,19 +4,17 @@
 class Fetcher
   require 'uri'
   require 'open-uri'
-  require 'logger'
 
-  attr_reader :url, :logger
+  attr_reader :url
 
   def initialize(url = '')
-    @url = url.start_with?(/https?:\/\//) ? url : "http://#{url}"
-    @logger = Logger.new(STDOUT)
+    @url = url
   end
 
   def fetch
     raise 'Invalid URL' unless valid_url?
 
-    tempfile = URI.open(@url)
+    tempfile = URI.open(url)
     tempfile.read
   end
 
@@ -26,14 +24,14 @@ class Fetcher
   end
 
   def valid_url?
-    uri = URI(@url)
+    uri = URI(url)
     !!uri&.host && !uri.host.empty?
   end
 
   private
 
   def filename
-    uri = URI(@url)
+    uri = URI(url)
     "#{uri.host}.html"
   end
 end

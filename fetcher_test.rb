@@ -10,11 +10,11 @@ class FetcherTest < Minitest::Test
     WebMock.enable!
 
     raw_response_file = File.new('test/google.com.raw')
-    stub_request(:get, 'http://google.com').to_return(raw_response_file)
+    stub_request(:get, 'https://google.com').to_return(raw_response_file)
   end
 
   def test_valid_url_when_is_valid
-    fetcher = Fetcher.new('google.com')
+    fetcher = Fetcher.new('https://google.com')
 
     assert(fetcher.valid_url?)
   end
@@ -36,7 +36,7 @@ class FetcherTest < Minitest::Test
   end
 
   def test_fetch_valid_url
-    fetcher = Fetcher.new('google.com')
+    fetcher = Fetcher.new('https://google.com')
 
     body = fetcher.fetch
 
@@ -44,7 +44,7 @@ class FetcherTest < Minitest::Test
   end
 
   def test_save_html_file
-    fetcher = Fetcher.new('google.com')
+    fetcher = Fetcher.new('https://google.com')
 
     File.stub(:write, true) do
       result = fetcher.save_html_file
