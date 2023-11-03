@@ -4,6 +4,7 @@
 class Fetcher
   require 'uri'
   require 'open-uri'
+  require_relative './metadata'
 
   attr_reader :url
 
@@ -12,26 +13,30 @@ class Fetcher
   end
 
   def fetch
+    File.write(filename, fetch_content)
+    metadata = Metadata.new(filename)
+
+    { last_fetch: Time.now.utc, site: host }.merge(metadata.summary)
+  end
+
+  def fetch_content
     raise 'Invalid URL' unless valid_url?
 
     tempfile = URI.open(url)
     tempfile.read
   end
 
-  def save_html_file
-    File.write(filename, fetch)
-    filename
-  end
-
   def valid_url?
-    uri = URI(url)
-    !!uri&.host && !uri.host.empty?
+    host && !host.empty?
   end
 
   private
 
+  def host
+    URI(url).host
+  end
+
   def filename
-    uri = URI(url)
-    "#{uri.host}.html"
+    "#{host}.html"
   end
 end
