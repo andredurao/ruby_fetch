@@ -31,11 +31,11 @@ class Fetcher
     end
   end
 
-  private
-
   def valid_url?
-    !!URI(@url).host
+    !URI(@url).host.empty?
   end
+
+  private
 
   def use_ssl?
     @uri.scheme == 'https'
